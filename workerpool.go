@@ -100,7 +100,6 @@ func (t *Task) Process() {
 	op_data["attributes"] = attr
 	op_data["traits"] = trt
 
-	fmt.Print("one process done\n")
 	res, err := json.Marshal(op_data)
 	if err != nil {
 		log.Fatal(err)
@@ -121,30 +120,36 @@ type WorkerPool struct {
 	concurrency int
 	tasksChan   chan Task
 	wg          sync.WaitGroup
+	WorkerId    int
 }
 
 // Functions to execute the worker pool
-
 func (wp *WorkerPool) worker() {
+
+	fmt.Printf("Started worker of id: %d\n", wp.WorkerId)
 	for task := range wp.tasksChan {
+		fmt.Printf("Processing the task...\n")
 		task.Process()
 		wp.wg.Done()
 	}
+
 }
 
-func (wp *WorkerPool) Run() {
+func (wp *WorkerPool) StartWorker() {
 	//initialize the task channel
-	wp.tasksChan = make(chan Task, len(wp.Tasks))
-
+	wp.tasksChan = make(chan Task, 1)
 	// start the worker go routines
 	for i := 0; i < wp.concurrency; i++ {
 		go wp.worker()
 	}
+}
+func (wp *WorkerPool) Run() {
+
 	wp.wg.Add(len(wp.Tasks))
 	for _, task := range wp.Tasks {
 		wp.tasksChan <- task
 	}
-	close(wp.tasksChan)
+	//close(wp.tasksChan)
 
 	wp.wg.Wait()
 }
