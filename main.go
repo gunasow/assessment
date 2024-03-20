@@ -11,7 +11,6 @@ import (
 
 var wp= WorkerPool{
 	concurrency: 3,
-	WorkerId: 1,
 }
 func GetData(w http.ResponseWriter, req *http.Request) {
 
@@ -42,6 +41,7 @@ func main() {
 	//start worker
 	wp.StartWorker()
 	fmt.Printf("No of workers: %d\n",runtime.NumGoroutine())
+	
 	fmt.Printf("Starting port server 8080\n")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatal(err)

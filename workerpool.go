@@ -120,19 +120,17 @@ type WorkerPool struct {
 	concurrency int
 	tasksChan   chan Task
 	wg          sync.WaitGroup
-	WorkerId    int
+
 }
 
 // Functions to execute the worker pool
 func (wp *WorkerPool) worker() {
 
-	fmt.Printf("Started worker of id: %d\n", wp.WorkerId)
 	for task := range wp.tasksChan {
 		fmt.Printf("Processing the task...\n")
 		task.Process()
 		wp.wg.Done()
 	}
-
 }
 
 func (wp *WorkerPool) StartWorker() {
@@ -149,7 +147,6 @@ func (wp *WorkerPool) Run() {
 	for _, task := range wp.Tasks {
 		wp.tasksChan <- task
 	}
-	//close(wp.tasksChan)
 
 	wp.wg.Wait()
 }
